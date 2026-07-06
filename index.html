@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Lilly" />
+  <title>Lilly — Your Personal Assistant</title>
+  <link rel="manifest" href="manifest.json" />
+
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --bg:        #07071a;
+      --surface:   #0f0f2e;
+      --card:      #13133a;
+      --border:    #1e1e4a;
+      --accent:    #7c5cfc;
+      --accent2:   #00e5c8;
+      --accent3:   #fc5c8a;
+      --text:      #e8e8ff;
+      --muted:     #7070a0;
+      --success:   #00e5c8;
+      --danger:    #fc5c8a;
+      --radius:    18px;
+      --font:      'Segoe UI', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 10px;
+      background: linear-gradient(180deg, #0f0f2e 0%, transparent 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { font-size: 22px; font-weight: 800; letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .lang-selector select {
+      background: var(--card); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 6px 10px; font-size: 13px; cursor: pointer; outline: none;
+    }
+
+    /* ── ROBOT FACE ── */
+    .robot-wrap {
+      position: relative;
+      width: 200px; height: 200px;
+      margin: 10px auto 4px;
+    }
+    .robot-glow {
+      position: absolute; inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.25) 0%, transparent 70%);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%,100% { opacity: 0.4; transform: scale(1); }
+      50%      { opacity: 1;   transform: scale(1.08); }
+    }
+
+    .robot-svg { width: 200px; height: 200px; }
+
+    /* Eye animations */
+    .eye { transition: all 0.3s; }
+    .eye-pupil { transform-origin: center; }
+
+    /* Speaking animation — mouth */
+    .mouth-bar {
+      transform-origin: center;
+      transition: all 0.1s;
+    }
+
+    /* States: idle / listening / speaking / thinking */
+    body.listening  .robot-glow { background: radial-gradient(circle, rgba(0,229,200,0.35) 0%, transparent 70%); }
+    body.speaking   .robot-glow { background: radial-gradient(circle, rgba(252,92,138,0.35) 0%, transparent 70%); }
+    body.thinking   .robot-glow { background: radial-gradient(circle, rgba(124,92,252,0.45) 0%, transparent 70%); }
+
+    /* ── STATUS CHIP ── */
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 6px 16px;
+      font-size: 13px; color: var(--muted);
+      margin-bottom: 8px; transition: all 0.3s;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted); transition: background 0.3s;
+    }
+    body.listening  .status-chip { color: var(--accent2); border-color: var(--accent2); }
+    body.listening  .status-dot  { background: var(--accent2); animation: blink 0.7s infinite; }
+    body.speaking   .status-chip { color: var(--accent3); border-color: var(--accent3); }
+    body.speaking   .status-dot  { background: var(--accent3); }
+    body.thinking   .status-chip { color: var(--accent); border-color: var(--accent); }
+    body.thinking   .status-dot  { background: var(--accent); animation: spin-dot 1s linear infinite; }
+    @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    @keyframes spin-dot { 0%{transform:scale(1)} 50%{transform:scale(0.4)} 100%{transform:scale(1)} }
+
+    /* ── CHAT AREA ── */
+    .chat-area {
+      width: 100%; max-width: 520px;
+      flex: 1;
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .bubble {
+      max-width: 85%;
+      padding: 11px 15px;
+      border-radius: var(--radius);
+      font-size: 14.5px;
+      line-height: 1.55;
+      animation: pop-in 0.25s ease;
+    }
+    @keyframes pop-in {
+      from { opacity:0; transform: translateY(8px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, var(--accent), #5a3fd4);
+      color: #fff; align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.lilly {
+      background: var(--card); border: 1px solid var(--border);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .bubble.lilly .speaker { font-weight: 700; color: var(--accent2);
+      font-size: 12px; margin-bottom: 3px; }
+
+    /* ── QUICK COMMANDS ── */
+    .quick-commands {
+      width: 100%; max-width: 520px;
+      padding: 0 14px 6px;
+      display: flex; gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .quick-commands::-webkit-scrollbar { display: none; }
+    .qcmd {
+      flex-shrink: 0;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 7px 14px;
+      font-size: 13px; color: var(--text);
+      cursor: pointer; white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .qcmd:active { background: var(--accent); border-color: var(--accent); }
+
+    /* ── INPUT BAR ── */
+    .input-bar {
+      width: 100%; max-width: 520px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px 20px;
+      background: var(--bg);
+      position: sticky; bottom: 0;
+    }
+    .text-input {
+      flex: 1;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 12px 18px;
+      color: var(--text); font-size: 15px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .text-input:focus { border-color: var(--accent); }
+    .text-input::placeholder { color: var(--muted); }
+
+    .btn-send, .btn-mic {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: none; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .btn-send {
+      background: linear-gradient(135deg, var(--accent), #5a3fd4);
+    }
+    .btn-send:active { transform: scale(0.9); }
+
+    .btn-mic {
+      background: var(--card); border: 1.5px solid var(--border);
+    }
+    .btn-mic.recording {
+      background: var(--accent3); border-color: var(--accent3);
+      animation: mic-pulse 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes mic-pulse { from{transform:scale(1)} to{transform:scale(1.12)} }
+
+    /* ── WAVE BARS (mouth animation) ── */
+    .wave-bars {
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 30px;
+    }
+    .wave-bar {
+      width: 4px; border-radius: 2px;
+      background: var(--accent3);
+      transition: height 0.1s;
+    }
+
+    /* ── SCROLLBAR ── */
+    .chat-area::-webkit-scrollbar { width: 3px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── FEATURE PILLS ── */
+    .feature-row {
+      width: 100%; max-width: 520px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 8px; padding: 0 14px 8px;
+    }
+    .feat-pill {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 6px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 5px; cursor: pointer; transition: all 0.2s;
+      font-size: 11px; color: var(--muted); text-align: center;
+    }
+    .feat-pill .icon { font-size: 22px; }
+    .feat-pill:active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">LILLY</div>
+  <div class="lang-selector">
+    <select id="langSelect" onchange="setLang(this.value)">
+      <option value="en-IN">English</option>
+      <option value="kn-IN">ಕನ್ನಡ</option>
+      <option value="te-IN">తెలుగు</option>
+      <option value="hi-IN">हिन्दी</option>
+    </select>
+  </div>
+</header>
+
+<!-- ROBOT FACE -->
+<div class="robot-wrap">
+  <div class="robot-glow"></div>
+  <svg class="robot-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head body -->
+    <rect x="30" y="55" width="140" height="110" rx="28" fill="#13133a" stroke="#1e1e4a" stroke-width="2"/>
+    <!-- Antenna -->
+    <rect x="97" y="25" width="6" height="30" rx="3" fill="#7c5cfc"/>
+    <circle cx="100" cy="22" r="8" fill="#7c5cfc" id="antenna-ball">
+      <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#7c5cfc;#00e5c8;#7c5cfc" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Ears -->
+    <rect x="18" y="85" width="14" height="30" rx="7" fill="#1e1e4a"/>
+    <rect x="168" y="85" width="14" height="30" rx="7" fill="#1e1e4a"/>
+    <!-- Eyes background -->
+    <rect x="48" y="80" width="42" height="38" rx="12" fill="#07071a"/>
+    <rect x="110" y="80" width="42" height="38" rx="12" fill="#07071a"/>
+    <!-- Left eye -->
+    <circle cx="69" cy="99" r="10" fill="#7c5cfc" id="left-eye" class="eye">
+      <animate attributeName="ry" values="10;10;1;10;10" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="72" cy="96" r="4" fill="#fff" id="left-pupil"/>
+    <!-- Right eye -->
+    <circle cx="131" cy="99" r="10" fill="#7c5cfc" id="right-eye" class="eye">
+      <animate attributeName="ry" values="10;10;1;10;10" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="134" cy="96" r="4" fill="#fff" id="right-pupil"/>
+    <!-- Mouth area -->
+    <rect x="58" y="133" width="84" height="18" rx="9" fill="#07071a" id="mouth-bg"/>
+    <!-- Mouth bars (animated when speaking) -->
+    <rect x="67"  y="137" width="6" height="10" rx="3" fill="#fc5c8a" id="mb1"/>
+    <rect x="77"  y="135" width="6" height="14" rx="3" fill="#fc5c8a" id="mb2"/>
+    <rect x="87"  y="138" width="6" height="8"  rx="3" fill="#fc5c8a" id="mb3"/>
+    <rect x="97"  y="134" width="6" height="16" rx="3" fill="#fc5c8a" id="mb4"/>
+    <rect x="107" y="137" width="6" height="10" rx="3" fill="#fc5c8a" id="mb5"/>
+    <rect x="117" y="135" width="6" height="14" rx="3" fill="#fc5c8a" id="mb6"/>
+    <!-- Chest panel -->
+    <rect x="55" y="155" width="90" height="4" rx="2" fill="#1e1e4a"/>
+    <!-- Indicator lights -->
+    <circle cx="75" cy="163" r="4" fill="#00e5c8" id="light1">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="163" r="4" fill="#7c5cfc" id="light2">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="125" cy="163" r="4" fill="#fc5c8a" id="light3">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+</div>
+
+<!-- STATUS -->
+<div class="status-chip" id="statusChip">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Ready — say something or type below</span>
+</div>
+
+<!-- CHAT AREA -->
+<div class="chat-area" id="chatArea">
+  <div class="bubble lilly">
+    <div class="speaker">LILLY</div>
+    Hello Pavan! I am Lilly, your personal assistant. I understand English, ಕನ್ನಡ, తెలుగు and हिन्दी. How can I help you today?
+  </div>
+</div>
+
+<!-- FEATURE PILLS -->
+<div class="feature-row">
+  <div class="feat-pill" onclick="sendCommand('check mail')">
+    <span class="icon">📬</span>Check Mail
+  </div>
+  <div class="feat-pill" onclick="sendCommand('good morning')">
+    <span class="icon">🌅</span>Morning
+  </div>
+  <div class="feat-pill" onclick="sendCommand('check calendar')">
+    <span class="icon">📅</span>Calendar
+  </div>
+  <div class="feat-pill" onclick="sendCommand('organise files')">
+    <span class="icon">📁</span>Organise
+  </div>
+  <div class="feat-pill" onclick="sendCommand('draft reply')">
+    <span class="icon">💬</span>Reply
+  </div>
+  <div class="feat-pill" onclick="sendCommand('tomorrow')">
+    <span class="icon">🗓️</span>Tomorrow
+  </div>
+  <div class="feat-pill" onclick="sendCommand('lock screen')">
+    <span class="icon">🔒</span>Lock
+  </div>
+  <div class="feat-pill" onclick="sendCommand('log off')">
+    <span class="icon">⏻</span>Log Off
+  </div>
+</div>
+
+<!-- QUICK COMMANDS -->
+<div class="quick-commands">
+  <div class="qcmd" onclick="sendCommand('check mail')">📬 Check Mail</div>
+  <div class="qcmd" onclick="sendCommand('good morning')">🌅 Good Morning</div>
+  <div class="qcmd" onclick="sendCommand('check calendar')">📅 Today\'s Events</div>
+  <div class="qcmd" onclick="sendCommand('tomorrow')">🗓️ Tomorrow</div>
+  <div class="qcmd" onclick="sendCommand('organise files')">📁 Organise Files</div>
+  <div class="qcmd" onclick="sendCommand('draft reply')">💬 Draft Reply</div>
+  <div class="qcmd" onclick="sendCommand('lock screen')">🔒 Lock Screen</div>
+  <div class="qcmd" onclick="sendCommand('log off')">⏻ Log Off</div>
+</div>
+
+<!-- INPUT BAR -->
+<div class="input-bar">
+  <button class="btn-mic" id="micBtn" onclick="toggleMic()" title="Voice input">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="9" y="2" width="6" height="12" rx="3" fill="#e8e8ff"/>
+      <path d="M5 10a7 7 0 0014 0" stroke="#e8e8ff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="12" y1="19" x2="12" y2="22" stroke="#e8e8ff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="8" y1="22" x2="16" y2="22" stroke="#e8e8ff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <input class="text-input" id="textInput" type="text"
+    placeholder="Type or speak a command..."
+    onkeydown="if(event.key==='Enter') sendFromInput()" />
+  <button class="btn-send" onclick="sendFromInput()" title="Send">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M22 2L11 13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+// ── LANGUAGE & SPEECH SETUP ──
+let currentLang = 'en-IN';
+let recognition  = null;
+let isRecording  = false;
+let isSpeaking   = false;
+let mouthInterval = null;
+
+const LANG_GREETINGS = {
+  'en-IN': 'Hello Pavan! I am Lilly. How can I help you today?',
+  'kn-IN': 'ನಮಸ್ಕಾರ ಪವನ್! ನಾನು ಲಿಲ್ಲಿ. ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?',
+  'te-IN': 'నమస్కారం పవన్! నేను లిల్లీ. మీకు ఎలా సహాయం చేయాలి?',
+  'hi-IN': 'नमस्ते पवन! मैं लिली हूँ। आज मैं आपकी कैसे मदद कर सकती हूँ?',
+};
+
+const LANG_RESPONSES = {
+  'check mail': {
+    'en-IN': 'Checking your Gmail now. I will read your unread emails and send a summary to your WhatsApp.',
+    'kn-IN': 'ನಿಮ್ಮ Gmail ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ. ಓದದ ಇಮೇಲ್‌ಗಳ ಸಾರಾಂಶವನ್ನು WhatsApp ಗೆ ಕಳುಹಿಸುತ್ತೇನೆ.',
+    'te-IN': 'మీ Gmail చెక్ చేస్తున్నాను. చదవని ఇమెయిల్స్ సారాంశం WhatsApp కు పంపుతాను.',
+    'hi-IN': 'आपका Gmail चेक कर रही हूँ। अपठित ईमेल का सारांश WhatsApp पर भेजूंगी।',
+  },
+  'good morning': {
+    'en-IN': 'Good morning Pavan! Getting your weather, calendar and emails ready now.',
+    'kn-IN': 'ಶುಭೋದಯ ಪವನ್! ನಿಮ್ಮ ಹವಾಮಾನ, ಕ್ಯಾಲೆಂಡರ್ ಮತ್ತು ಇಮೇಲ್ ತಯಾರಿಸುತ್ತಿದ್ದೇನೆ.',
+    'te-IN': 'శుభోదయం పవన్! మీ వాతావరణం, క్యాలెండర్ మరియు ఇమెయిల్ తయారు చేస్తున్నాను.',
+    'hi-IN': 'सुप्रभात पवन! आपका मौसम, कैलेंडर और ईमेल तैयार कर रही हूँ।',
+  },
+  'check calendar': {
+    'en-IN': 'Checking your Google Calendar for today\'s events. One moment please.',
+    'kn-IN': 'ಇಂದಿನ ಕಾರ್ಯಕ್ರಮಗಳಿಗಾಗಿ ನಿಮ್ಮ Google Calendar ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ.',
+    'te-IN': 'ఈరోజు కార్యక్రమాల కోసం మీ Google Calendar చెక్ చేస్తున్నాను.',
+    'hi-IN': 'आज के कार्यक्रमों के लिए Google Calendar चेक कर रही हूँ।',
+  },
+  'tomorrow': {
+    'en-IN': 'Let me check tomorrow\'s schedule for you.',
+    'kn-IN': 'ನಾಳೆಯ ಕಾರ್ಯಕ್ರಮ ನೋಡುತ್ತಿದ್ದೇನೆ.',
+    'te-IN': 'రేపటి షెడ్యూల్ చూస్తున్నాను.',
+    'hi-IN': 'कल का शेड्यूल देख रही हूँ।',
+  },
+  'organise files': {
+    'en-IN': 'I will organise your Downloads folder now. Please confirm this action.',
+    'kn-IN': 'ನಿಮ್ಮ Downloads ಫೋಲ್ಡರ್ ಅನ್ನು ಆಯೋಜಿಸುತ್ತೇನೆ. ದಯವಿಟ್ಟು ದೃಢೀಕರಿಸಿ.',
+    'te-IN': 'మీ Downloads ఫోల్డర్ నిర్వహిస్తాను. దయచేసి నిర్ధారించండి.',
+    'hi-IN': 'आपका Downloads फ़ोल्डर व्यवस्थित करूंगी। कृपया पुष्टि करें।',
+  },
+  'draft reply': {
+    'en-IN': 'Opening WhatsApp to read your last message and draft a reply for you.',
+    'kn-IN': 'ನಿಮ್ಮ ಕೊನೆಯ WhatsApp ಸಂದೇಶ ಓದಲು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.',
+    'te-IN': 'మీ చివరి WhatsApp సందేశం చదవడానికి తెరుస్తున్నాను.',
+    'hi-IN': 'आपके अंतिम WhatsApp संदेश को पढ़कर जवाब तैयार करूंगी।',
+  },
+  'lock screen': {
+    'en-IN': 'Are you sure you want to lock the screen? Please type YES to confirm.',
+    'kn-IN': 'ಸ್ಕ್ರೀನ್ ಲಾಕ್ ಮಾಡಬೇಕೇ? ದಯವಿಟ್ಟು YES ಎಂದು ಟೈಪ್ ಮಾಡಿ.',
+    'te-IN': 'స్క్రీన్ లాక్ చేయాలా? దయచేసి YES అని టైప్ చేయండి.',
+    'hi-IN': 'क्या आप स्क्रीन लॉक करना चाहते हैं? कृपया YES टाइप करें।',
+  },
+  'log off': {
+    'en-IN': 'Are you sure you want to log off? Please type YES to confirm.',
+    'kn-IN': 'ಲಾಗ್ ಆಫ್ ಮಾಡಬೇಕೇ? ದಯವಿಟ್ಟು YES ಎಂದು ಟೈಪ್ ಮಾಡಿ.',
+    'te-IN': 'లాగ్ ఆఫ్ చేయాలా? దయచేసి YES అని టైప్ చేయండి.',
+    'hi-IN': 'क्या आप लॉग ऑफ करना चाहते हैं? कृपया YES टाइप करें।',
+  },
+};
+
+const DEFAULT_RESPONSE = {
+  'en-IN': "I'm not sure about that command. Try saying: check mail, good morning, check calendar, organise files, draft reply, lock screen, or log off.",
+  'kn-IN': "ಆ ಆದೇಶ ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ಈ ಆದೇಶಗಳನ್ನು ಪ್ರಯತ್ನಿಸಿ: check mail, good morning, check calendar.",
+  'te-IN': "ఆ ఆదేశం నాకు అర్థం కాలేదు. ఇవి ప్రయత్నించండి: check mail, good morning, check calendar.",
+  'hi-IN': "वह कमांड समझ नहीं आई। कृपया आज़माएं: check mail, good morning, check calendar.",
+};
+
+// ── SET LANGUAGE ──
+function setLang(lang) {
+  currentLang = lang;
+  const greeting = LANG_GREETINGS[lang] || LANG_GREETINGS['en-IN'];
+  addBubble('lilly', greeting);
+  speak(greeting);
+}
+
+// ── ADD CHAT BUBBLE ──
+function addBubble(who, text) {
+  const area = document.getElementById('chatArea');
+  const div  = document.createElement('div');
+  div.className = `bubble ${who}`;
+  if (who === 'lilly') {
+    div.innerHTML = `<div class="speaker">LILLY</div>${text}`;
+  } else {
+    div.textContent = text;
+  }
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+// ── SET STATUS ──
+function setStatus(state, text) {
+  document.body.className = state;
+  document.getElementById('statusText').textContent = text;
+}
+
+// ── MOUTH ANIMATION ──
+function startMouthAnim() {
+  const bars = ['mb1','mb2','mb3','mb4','mb5','mb6'];
+  const heights = [10,14,8,16,10,14];
+  mouthInterval = setInterval(() => {
+    bars.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) {
+        const h = Math.floor(Math.random() * 14) + 4;
+        el.setAttribute('height', h);
+        el.setAttribute('y', 143 - h);
+      }
+    });
+  }, 120);
+}
+
+function stopMouthAnim() {
+  clearInterval(mouthInterval);
+  // Reset bars
+  const defaults = [[67,137,10],[77,135,14],[87,138,8],[97,134,16],[107,137,10],[117,135,14]];
+  ['mb1','mb2','mb3','mb4','mb5','mb6'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.setAttribute('height', defaults[i][2]);
+      el.setAttribute('y', defaults[i][1]);
+    }
+  });
+}
+
+// ── SPEAK (Text-to-Speech) ──
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang  = currentLang;
+  utter.rate  = 0.95;
+  utter.pitch = 1.05;
+
+  // Try to find a matching voice
+  const voices = window.speechSynthesis.getVoices();
+  const match  = voices.find(v => v.lang === currentLang || v.lang.startsWith(currentLang.split('-')[0]));
+  if (match) utter.voice = match;
+
+  utter.onstart = () => {
+    setStatus('speaking', 'Lilly is speaking...');
+    startMouthAnim();
+  };
+  utter.onend = () => {
+    setStatus('', 'Ready — say something or type below');
+    stopMouthAnim();
+  };
+  window.speechSynthesis.speak(utter);
+}
+
+// ── PROCESS COMMAND ──
+function processCommand(rawText) {
+  if (!rawText.trim()) return;
+
+  const text = rawText.toLowerCase().trim();
+  addBubble('user', rawText);
+  setStatus('thinking', 'Lilly is thinking...');
+
+  setTimeout(() => {
+    let response = null;
+
+    // Match command
+    if (text.includes('check mail') || text.includes('mail') || text.includes('email') ||
+        text.includes('inbox') || text.includes('ಮೇಲ್') || text.includes('మెయిల్') || text.includes('मेल')) {
+      response = LANG_RESPONSES['check mail'][currentLang];
+    } else if (text.includes('good morning') || text.includes('morning') || text.includes('briefing') ||
+               text.includes('ಶುಭೋದಯ') || text.includes('శుభోదయం') || text.includes('सुप्रभात')) {
+      response = LANG_RESPONSES['good morning'][currentLang];
+    } else if (text.includes('calendar') || text.includes('today') || text.includes('schedule') ||
+               text.includes('ಕ್ಯಾಲೆಂಡರ್') || text.includes('క్యాలెండర్') || text.includes('कैलेंडर')) {
+      response = LANG_RESPONSES['check calendar'][currentLang];
+    } else if (text.includes('tomorrow') || text.includes('ನಾಳೆ') || text.includes('రేపు') || text.includes('कल')) {
+      response = LANG_RESPONSES['tomorrow'][currentLang];
+    } else if (text.includes('organise') || text.includes('organize') || text.includes('files') || text.includes('sort') ||
+               text.includes('ಫೈಲ್') || text.includes('ఫైల్') || text.includes('फ़ाइल')) {
+      response = LANG_RESPONSES['organise files'][currentLang];
+    } else if (text.includes('draft') || text.includes('reply') || text.includes('whatsapp') ||
+               text.includes('ರಿಪ್ಲೈ') || text.includes('రిప్లై') || text.includes('जवाब')) {
+      response = LANG_RESPONSES['draft reply'][currentLang];
+    } else if (text.includes('lock') || text.includes('ಲಾಕ್') || text.includes('లాక్') || text.includes('लॉक')) {
+      response = LANG_RESPONSES['lock screen'][currentLang];
+    } else if (text.includes('log off') || text.includes('logout') || text.includes('sign out') ||
+               text.includes('ಲಾಗ್ ಆಫ್') || text.includes('లాగ్ ఆఫ్') || text.includes('लॉग ऑफ')) {
+      response = LANG_RESPONSES['log off'][currentLang];
+    } else {
+      response = DEFAULT_RESPONSE[currentLang] || DEFAULT_RESPONSE['en-IN'];
+    }
+
+    addBubble('lilly', response);
+    speak(response);
+  }, 700);
+}
+
+// ── SEND FROM INPUT ──
+function sendFromInput() {
+  const input = document.getElementById('textInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  processCommand(text);
+}
+
+// ── SEND QUICK COMMAND ──
+function sendCommand(cmd) {
+  processCommand(cmd);
+}
+
+// ── VOICE INPUT (MIC) ──
+function toggleMic() {
+  if (isRecording) {
+    stopMic();
+    return;
+  }
+  startMic();
+}
+
+function startMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    addBubble('lilly', 'Voice input is not supported on this browser. Please use Chrome.');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang            = currentLang;
+  recognition.continuous      = false;
+  recognition.interimResults  = false;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    setStatus('listening', 'Listening... speak now');
+  };
+
+  recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    stopMic();
+    processCommand(transcript);
+  };
+
+  recognition.onerror = (e) => {
+    stopMic();
+    setStatus('', 'Ready — say something or type below');
+    addBubble('lilly', 'Could not hear you clearly. Please try again.');
+  };
+
+  recognition.onend = () => { stopMic(); };
+
+  recognition.start();
+}
+
+function stopMic() {
+  isRecording = false;
+  document.getElementById('micBtn').classList.remove('recording');
+  if (recognition) { try { recognition.stop(); } catch(e){} }
+  setStatus('', 'Ready — say something or type below');
+}
+
+// ── INIT VOICES (needed for some browsers) ──
+window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+
+// ── AUTO-GREET ON LOAD ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const greeting = LANG_GREETINGS['en-IN'];
+    speak(greeting);
+  }, 800);
+});
+</script>
+</body>
+</html>
