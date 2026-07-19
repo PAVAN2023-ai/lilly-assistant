@@ -9,14 +9,12 @@
 <meta name="apple-mobile-web-app-title" content="Lilly"/>
 <title>Lilly — AI Assistant</title>
 <link rel="manifest" href="manifest.json"/>
-<!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --bg:#000812;--ring:#00c8ff;--ring2:#0055ff;--accent:#00ffcc;
   --danger:#ff3355;--warn:#ffaa00;--text:#b8e8ff;--muted:#2a6080;
-  --border:rgba(0,160,255,0.18);--card:rgba(0,20,50,0.75);
-  --font:'Segoe UI',system-ui,sans-serif;
+  --border:rgba(0,160,255,0.18);--font:'Segoe UI',system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--text);
@@ -35,13 +33,11 @@ body::before{content:'';position:fixed;inset:0;
     linear-gradient(to left,rgba(0,180,255,0.4) 2px,transparent 2px) 100% 100%/20px 20px no-repeat,
     linear-gradient(to top,rgba(0,180,255,0.4) 2px,transparent 2px) 100% 100%/20px 20px no-repeat;
   pointer-events:none;z-index:998;}
-
-/* HEADER */
 header{width:100%;display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px 7px;border-bottom:1px solid var(--border);
   background:rgba(0,6,18,0.97);position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);}
 .logo{font-size:19px;font-weight:900;letter-spacing:5px;color:var(--ring);
-  text-shadow:0 0 15px var(--ring),0 0 30px rgba(0,200,255,0.4);}
+  text-shadow:0 0 15px var(--ring);}
 .logo-sub{font-size:8px;letter-spacing:3px;color:var(--muted);font-weight:400;display:block;margin-top:-2px}
 .hdr-r{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end;}
 .lang-sel{background:rgba(0,15,35,0.9);color:var(--text);border:1px solid var(--border);
@@ -49,16 +45,13 @@ header{width:100%;display:flex;align-items:center;justify-content:space-between;
 .wake-badge{font-size:8px;letter-spacing:1px;font-weight:700;padding:3px 8px;border-radius:4px;
   background:rgba(0,25,50,0.9);border:1px solid var(--muted);color:var(--muted);
   transition:all .3s;text-transform:uppercase;}
-.wake-badge.awake{color:var(--accent);border-color:var(--accent);
-  animation:wpulse 1s ease-in-out infinite;}
+.wake-badge.awake{color:var(--accent);border-color:var(--accent);animation:wpulse 1s ease-in-out infinite;}
 @keyframes wpulse{0%,100%{box-shadow:0 0 8px rgba(0,255,200,0.3)}50%{box-shadow:0 0 18px rgba(0,255,200,0.6)}}
-.net-badge{font-size:8px;font-weight:700;letter-spacing:1px;padding:3px 7px;
+.srv-badge{font-size:8px;font-weight:700;letter-spacing:1px;padding:3px 7px;
   border-radius:4px;text-transform:uppercase;transition:all .3s;}
-.net-badge.online{background:rgba(0,255,100,0.1);border:1px solid rgba(0,255,100,0.3);color:#00ff88}
-.net-badge.offline{background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);color:#ff5555}
-
-/* HUD FACE */
-.hud-wrap{position:relative;width:230px;height:230px;margin:5px auto 2px;flex-shrink:0;}
+.srv-badge.ok{background:rgba(0,255,100,0.1);border:1px solid rgba(0,255,100,0.3);color:#00ff88}
+.srv-badge.err{background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);color:#ff5555}
+.hud-wrap{position:relative;width:220px;height:220px;margin:5px auto 2px;flex-shrink:0;}
 .hud-glow{position:absolute;inset:-25px;border-radius:50%;
   background:radial-gradient(circle,rgba(0,180,255,0.1) 0%,transparent 70%);transition:all .5s;}
 body.listening .hud-glow{background:radial-gradient(circle,rgba(0,255,200,0.2) 0%,transparent 70%)}
@@ -71,16 +64,12 @@ body.thinking  .hud-glow{background:radial-gradient(circle,rgba(0,80,255,0.2) 0%
 .r3{position:absolute;inset:26px;border-radius:50%;border:1px solid transparent;
   border-top-color:rgba(0,100,255,0.55);animation:rspin 4s linear infinite}
 @keyframes rspin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-.cdot{position:absolute;width:5px;height:5px;border-radius:50%;
-  background:var(--ring);box-shadow:0 0 7px var(--ring);}
-.face-svg{position:absolute;inset:38px;width:calc(100% - 76px);height:calc(100% - 76px);}
-
-/* STATUS */
+.cdot{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--ring);box-shadow:0 0 7px var(--ring);}
+.face-svg{position:absolute;inset:36px;width:calc(100% - 72px);height:calc(100% - 72px);}
 .status-chip{display:inline-flex;align-items:center;gap:6px;
   background:rgba(0,10,25,0.85);border:1px solid var(--border);border-radius:5px;
   padding:4px 11px;font-size:9px;color:var(--muted);letter-spacing:2px;
-  text-transform:uppercase;font-weight:700;backdrop-filter:blur(8px);
-  transition:all .3s;margin-bottom:3px;}
+  text-transform:uppercase;font-weight:700;transition:all .3s;margin-bottom:3px;}
 .sdot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:all .3s}
 body.listening .status-chip{color:var(--accent);border-color:var(--accent)}
 body.listening .sdot{background:var(--accent);box-shadow:0 0 6px var(--accent);animation:bl .5s infinite}
@@ -92,19 +81,13 @@ body.awake     .status-chip{color:var(--warn);border-color:var(--warn)}
 body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes th{0%,100%{transform:scale(1)}50%{transform:scale(.3)}}
-
-/* WAVE */
 .wave-wrap{display:flex;align-items:center;justify-content:center;gap:3px;
   height:18px;width:90px;margin:0 auto 3px}
 .wbar{width:3px;border-radius:2px;background:var(--ring);height:3px;transition:height .08s;}
-
-/* HUD DATA */
 .hud-data{width:100%;max-width:440px;display:flex;gap:4px;padding:0 10px 4px;}
 .hdata{flex:1;background:rgba(0,10,28,0.7);border:1px solid var(--border);
   border-radius:5px;padding:4px 6px;font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 .hdata .dval{font-size:10px;color:var(--ring);font-weight:700;margin-top:1px;letter-spacing:0}
-
-/* GMAIL ACCOUNTS BAR */
 .accounts-bar{width:100%;max-width:440px;padding:0 10px 4px;display:flex;gap:5px;
   overflow-x:auto;scrollbar-width:none;align-items:center;}
 .accounts-bar::-webkit-scrollbar{display:none}
@@ -116,9 +99,6 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
 .acct-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;}
 .acct-chip.active .dot{background:var(--accent);}
 .acct-chip.add-btn{border-style:dashed;color:var(--ring);border-color:var(--ring2);}
-.acct-chip.add-btn:active{background:rgba(0,50,150,0.3);}
-
-/* CHAT */
 .chat-area{width:100%;max-width:440px;flex:1;padding:0 10px;
   display:flex;flex-direction:column;gap:6px;overflow-y:auto;
   margin-bottom:4px;min-height:90px;max-height:28vh;}
@@ -131,42 +111,15 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
 .bubble.lilly{background:rgba(0,15,40,.75);border:1px solid var(--border);
   align-self:flex-start;border-bottom-left-radius:3px;}
 .bubble .spk{font-size:8px;font-weight:700;color:var(--accent);letter-spacing:2px;margin-bottom:3px}
-.bubble.sys{background:rgba(0,30,15,.6);border:1px solid rgba(0,255,150,.2);
-  font-style:italic;color:rgba(0,255,180,.8);align-self:center;
-  font-size:11px;border-radius:6px;text-align:center;}
-
-/* EMAIL CARDS */
-.email-summary-header{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px;
+.email-hdr{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px;
   padding-bottom:4px;border-bottom:1px solid var(--border);}
 .email-card{background:rgba(0,25,55,.7);border:1px solid rgba(0,160,255,.18);
-  border-radius:7px;padding:7px 9px;margin-bottom:5px;cursor:pointer;transition:all .2s;}
-.email-card:active{background:rgba(0,50,100,.5);}
+  border-radius:7px;padding:7px 9px;margin-bottom:5px;}
 .email-card .ef{font-size:10px;color:var(--accent);font-weight:700;margin-bottom:1px}
 .email-card .es{font-size:12px;color:var(--text);margin-bottom:2px;font-weight:600}
 .email-card .ep{font-size:11px;color:var(--muted);line-height:1.4}
-.email-card .em{font-size:9px;color:var(--muted);margin-top:3px;opacity:.7}
 .unread-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
   background:var(--accent);margin-right:4px;vertical-align:middle;}
-
-/* GOOGLE SIGN IN */
-.google-signin-wrap{
-  width:100%;max-width:440px;margin:5px 10px;
-  background:rgba(0,15,40,0.85);border:1px solid var(--border);
-  border-radius:10px;padding:14px;text-align:center;
-}
-.google-signin-wrap p{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5}
-.google-signin-wrap .title{font-size:14px;color:var(--text);font-weight:700;margin-bottom:5px}
-.btn-google{
-  display:inline-flex;align-items:center;gap:8px;
-  background:white;color:#333;border:none;border-radius:6px;
-  padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;
-  transition:all .2s;margin-bottom:6px;
-}
-.btn-google:active{transform:scale(.97)}
-.btn-google svg{width:18px;height:18px}
-.signin-note{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5}
-
-/* FEAT GRID */
 .feat-grid{width:100%;max-width:440px;display:grid;grid-template-columns:repeat(4,1fr);
   gap:4px;padding:0 10px 4px;}
 .fbtn{background:rgba(0,10,30,.8);border:1px solid var(--border);border-radius:7px;
@@ -175,8 +128,6 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
   text-align:center;letter-spacing:.5px;text-transform:uppercase;}
 .fbtn .fi{font-size:16px}
 .fbtn:active{background:rgba(0,70,180,.35);border-color:var(--ring);color:var(--text)}
-
-/* QUICK ROW */
 .quick-row{width:100%;max-width:440px;display:flex;gap:4px;
   padding:0 10px 4px;overflow-x:auto;scrollbar-width:none;}
 .quick-row::-webkit-scrollbar{display:none}
@@ -184,8 +135,6 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
   border-radius:5px;padding:5px 10px;font-size:11px;color:var(--text);
   cursor:pointer;white-space:nowrap;transition:all .2s;}
 .qp:active{background:rgba(0,70,200,.3);border-color:var(--ring)}
-
-/* INPUT BAR */
 .input-bar{width:100%;max-width:440px;display:flex;align-items:center;gap:6px;
   padding:6px 10px 14px;background:rgba(0,6,18,.97);
   position:sticky;bottom:0;border-top:1px solid var(--border);backdrop-filter:blur(12px);}
@@ -194,32 +143,29 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
   outline:none;transition:border-color .2s;}
 .txtin:focus{border-color:var(--ring)}
 .txtin::placeholder{color:var(--muted)}
-.btnmic,.btnsend{width:40px;height:40px;border-radius:7px;border:1px solid var(--border);
+.btnmic{width:40px;height:40px;border-radius:7px;border:1px solid var(--border);
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;flex-shrink:0;}
-.btnmic{background:rgba(0,15,40,.85)}
+  background:rgba(0,15,40,.85);transition:all .2s;flex-shrink:0;}
 .btnmic.rec{background:rgba(255,40,80,.25);border-color:var(--danger);animation:mrec .4s infinite alternate}
 @keyframes mrec{from{transform:scale(1)}to{transform:scale(1.1)}}
-.btnsend{background:rgba(0,60,160,.4);border-color:var(--ring2)}
-
-/* WAKE BANNER */
+.btnsend{width:40px;height:40px;border-radius:7px;border:1px solid var(--ring2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,60,160,.4);transition:all .2s;flex-shrink:0;}
 .wake-banner{display:none;position:fixed;top:55px;left:50%;transform:translateX(-50%);
   background:rgba(0,25,15,.97);border:1px solid var(--accent);border-radius:7px;
   padding:6px 16px;font-size:11px;color:var(--accent);letter-spacing:1px;
-  z-index:100;white-space:nowrap;box-shadow:0 0 20px rgba(0,255,180,.2);}
+  z-index:100;white-space:nowrap;}
 .wake-banner.show{display:block;animation:slin .3s ease;}
 @keyframes slin{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-
 .chat-area::-webkit-scrollbar{width:2px}
 .chat-area::-webkit-scrollbar-thumb{background:var(--border)}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">LILLY<span class="logo-sub">Personal AI Assistant</span></div>
   <div class="hdr-r">
-    <div class="net-badge online" id="netBadge">● ONLINE</div>
+    <div class="srv-badge err" id="srvBadge">● SERVER</div>
     <div class="wake-badge" id="wakeBadge">SLEEPING</div>
     <select class="lang-sel" id="langSel" onchange="setLang(this.value)">
       <option value="en-IN">EN</option>
@@ -229,10 +175,7 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
     </select>
   </div>
 </header>
-
 <div class="wake-banner" id="wakeBanner">🟢 Hey Pavan! I'm listening...</div>
-
-<!-- JARVIS HUD FACE -->
 <div class="hud-wrap">
   <div class="hud-glow"></div>
   <div class="r1"></div><div class="r2"></div><div class="r3"></div>
@@ -249,59 +192,35 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
         <feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
     </defs>
     <ellipse cx="80" cy="82" rx="68" ry="74" fill="url(#fg)" stroke="rgba(0,180,255,0.2)" stroke-width="1"/>
-    <line x1="80" y1="14" x2="80" y2="150" stroke="rgba(0,150,255,0.05)" stroke-width=".5"/>
-    <line x1="16" y1="82" x2="144" y2="82" stroke="rgba(0,150,255,0.05)" stroke-width=".5"/>
-    <path d="M26 52 L37 34 L80 26 L123 34 L134 52" fill="none" stroke="rgba(0,200,255,0.32)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M26 52 L37 34 L80 26 L123 34 L134 52" fill="none" stroke="rgba(0,200,255,0.32)" stroke-width="1.2" stroke-linecap="round"/>
     <path d="M34 122 Q80 148 126 122" fill="none" stroke="rgba(0,200,255,0.16)" stroke-width=".8"/>
     <rect x="14" y="68" width="12" height="2.5" rx="1" fill="rgba(0,200,255,0.42)"/>
-    <rect x="14" y="74" width="8" height="2" rx="1" fill="rgba(0,200,255,0.26)"/>
-    <rect x="14" y="79" width="10" height="2" rx="1" fill="rgba(0,200,255,0.26)"/>
     <rect x="134" y="68" width="12" height="2.5" rx="1" fill="rgba(0,200,255,0.42)"/>
-    <rect x="138" y="74" width="8" height="2" rx="1" fill="rgba(0,200,255,0.26)"/>
-    <rect x="136" y="79" width="10" height="2" rx="1" fill="rgba(0,200,255,0.26)"/>
-    <!-- LEFT EYE -->
     <polygon points="36,52 55,46 66,54 64,70 46,76 35,68" fill="rgba(0,30,70,.85)" stroke="rgba(0,200,255,.5)" stroke-width=".9"/>
     <ellipse cx="50" cy="61" rx="12" ry="8.5" fill="#000c1a"/>
     <circle cx="50" cy="61" r="8" fill="none" stroke="rgba(0,200,255,.5)" stroke-width="1.2"/>
-    <circle cx="50" cy="61" r="5.5" fill="rgba(0,15,40,.9)"/>
     <circle cx="50" cy="61" r="4" fill="#0088dd" filter="url(#eg)">
       <animate attributeName="r" values="4;5;4" dur="3s" repeatCount="indefinite"/>
       <animate attributeName="fill" values="#0088dd;#00ccff;#0088dd" dur="3s" repeatCount="indefinite"/>
     </circle>
     <circle cx="50" cy="61" r="2.2" fill="#00e0ff"/>
     <circle cx="53" cy="58" r="1.6" fill="white" opacity=".65"/>
-    <line x1="38" y1="61" x2="62" y2="61" stroke="rgba(0,200,255,.12)" stroke-width=".5"/>
-    <circle cx="50" cy="61" r="10" fill="none" stroke="rgba(0,200,255,.1)" stroke-width=".5" stroke-dasharray="3,4"/>
     <rect x="38" y="53" width="24" height="0" rx="2" fill="#000812">
       <animate attributeName="height" values="0;0;0;0;0;16;0;0;0" dur="7s" repeatCount="indefinite"/>
     </rect>
-    <path d="M38 57 Q50 51 62 57" fill="none" stroke="rgba(0,200,255,.32)" stroke-width=".8"/>
-    <!-- RIGHT EYE -->
     <polygon points="94,46 113,52 125,62 123,72 105,76 94,68" fill="rgba(0,30,70,.85)" stroke="rgba(0,200,255,.5)" stroke-width=".9"/>
     <ellipse cx="110" cy="61" rx="12" ry="8.5" fill="#000c1a"/>
     <circle cx="110" cy="61" r="8" fill="none" stroke="rgba(0,200,255,.5)" stroke-width="1.2"/>
-    <circle cx="110" cy="61" r="5.5" fill="rgba(0,15,40,.9)"/>
     <circle cx="110" cy="61" r="4" fill="#0088dd" filter="url(#eg)">
       <animate attributeName="r" values="4;5;4" dur="3s" begin=".15s" repeatCount="indefinite"/>
       <animate attributeName="fill" values="#0088dd;#00ccff;#0088dd" dur="3s" begin=".15s" repeatCount="indefinite"/>
     </circle>
     <circle cx="110" cy="61" r="2.2" fill="#00e0ff"/>
     <circle cx="113" cy="58" r="1.6" fill="white" opacity=".65"/>
-    <line x1="98" y1="61" x2="122" y2="61" stroke="rgba(0,200,255,.12)" stroke-width=".5"/>
-    <circle cx="110" cy="61" r="10" fill="none" stroke="rgba(0,200,255,.1)" stroke-width=".5" stroke-dasharray="3,4"/>
     <rect x="98" y="53" width="24" height="0" rx="2" fill="#000812">
       <animate attributeName="height" values="0;0;0;0;0;16;0;0;0" dur="7s" begin=".1s" repeatCount="indefinite"/>
     </rect>
-    <path d="M98 57 Q110 51 122 57" fill="none" stroke="rgba(0,200,255,.32)" stroke-width=".8"/>
-    <!-- NOSE -->
-    <line x1="80" y1="74" x2="80" y2="88" stroke="rgba(0,200,255,.1)" stroke-width=".6"/>
-    <line x1="74" y1="88" x2="86" y2="88" stroke="rgba(0,200,255,.16)" stroke-width=".6"/>
-    <!-- MOUTH -->
     <rect x="46" y="102" width="68" height="24" rx="5" fill="rgba(0,12,35,.95)" stroke="rgba(0,180,255,.28)" stroke-width=".8"/>
-    <path d="M46 107 L46 102 L51 102" fill="none" stroke="rgba(0,200,255,.5)" stroke-width=".8"/>
-    <path d="M114 102 L109 102" fill="none" stroke="rgba(0,200,255,.5)" stroke-width=".8"/>
-    <path d="M46 122 L46 126 L51 126" fill="none" stroke="rgba(0,200,255,.5)" stroke-width=".8"/>
-    <path d="M114 126 L109 126" fill="none" stroke="rgba(0,200,255,.5)" stroke-width=".8"/>
     <rect id="mb1" x="52" y="107" width="4" height="12" rx="2" fill="#00ccff"/>
     <rect id="mb2" x="58" y="105" width="4" height="16" rx="2" fill="#00ffcc"/>
     <rect id="mb3" x="64" y="108" width="4" height="10" rx="2" fill="#00aaff"/>
@@ -314,52 +233,35 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
     <rect x="58" y="138" width="0" height="2" rx="1" fill="rgba(0,200,255,.5)">
       <animate attributeName="width" values="0;44;0" dur="3.5s" repeatCount="indefinite"/>
     </rect>
-    <rect x="64" y="32" width="32" height="2" rx="1" fill="rgba(0,200,255,.22)"/>
     <path d="M18 18 L18 25 L25 18Z" fill="rgba(0,200,255,.32)"/>
     <path d="M142 18 L142 25 L135 18Z" fill="rgba(0,200,255,.32)"/>
     <path d="M18 142 L18 135 L25 142Z" fill="rgba(0,200,255,.32)"/>
     <path d="M142 142 L142 135 L135 142Z" fill="rgba(0,200,255,.32)"/>
   </svg>
 </div>
-
-<!-- STATUS -->
 <div class="status-chip" id="statChip">
   <div class="sdot"></div>
-  <span id="statTxt">SYSTEM READY — SAY "HEY LILLY" TO WAKE</span>
+  <span id="statTxt">CONNECTING TO SERVER...</span>
 </div>
-
-<!-- WAVE -->
 <div class="wave-wrap">
   <div class="wbar" id="w0"></div><div class="wbar" id="w1"></div>
   <div class="wbar" id="w2"></div><div class="wbar" id="w3"></div>
   <div class="wbar" id="w4"></div><div class="wbar" id="w5"></div>
   <div class="wbar" id="w6"></div>
 </div>
-
-<!-- HUD DATA -->
 <div class="hud-data">
   <div class="hdata">LANG<div class="dval" id="dLang">EN</div></div>
   <div class="hdata">MODE<div class="dval" id="dMode">STANDBY</div></div>
   <div class="hdata">TIME<div class="dval" id="dTime">--:--</div></div>
   <div class="hdata">ACCTS<div class="dval" id="dAccts">0</div></div>
 </div>
-
-<!-- GMAIL ACCOUNTS BAR -->
-<div class="accounts-bar" id="accountsBar">
-  <div class="acct-chip add-btn" onclick="addGmailAccount()" id="addAcctBtn">
-    ＋ Add Gmail
-  </div>
-</div>
-
-<!-- CHAT -->
+<div class="accounts-bar" id="accountsBar"></div>
 <div class="chat-area" id="chatArea">
   <div class="bubble lilly">
     <div class="spk">LILLY AI</div>
-    Hello Pavan! I work on ANY device — phone, laptop, tablet — just open this link and sign in. Tap <strong>+ Add Gmail</strong> above to connect your Gmail accounts. Say <strong>"Hey Lilly"</strong> to wake me up!
+    Hello Pavan! Connecting to server... Once connected, tap the mic button and say <strong>"Hey Lilly"</strong> to wake me up. I can answer any question, check your Gmail, tell jokes — everything!
   </div>
 </div>
-
-<!-- FEAT GRID -->
 <div class="feat-grid">
   <div class="fbtn" onclick="doCmd('check mail')"><span class="fi">📬</span>MAIL</div>
   <div class="fbtn" onclick="doCmd('good morning')"><span class="fi">🌅</span>MORNING</div>
@@ -370,18 +272,14 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
   <div class="fbtn" onclick="doCmd('lock screen')"><span class="fi">🔒</span>LOCK</div>
   <div class="fbtn" onclick="doCmd('log off')"><span class="fi">⏻</span>LOG OFF</div>
 </div>
-
-<!-- QUICK PILLS -->
 <div class="quick-row">
   <div class="qp" onclick="doCmd('who is Prime Minister of India')">🇮🇳 PM of India</div>
-  <div class="qp" onclick="doCmd('what is todays date and time')">🕐 Date & Time</div>
-  <div class="qp" onclick="doCmd('tell me a joke')">😄 Joke</div>
+  <div class="qp" onclick="doCmd('tell me a funny joke')">😄 Joke</div>
   <div class="qp" onclick="doCmd('weather in Bengaluru today')">🌤️ Weather</div>
+  <div class="qp" onclick="doCmd('what is todays date and time')">🕐 Date & Time</div>
   <div class="qp" onclick="doCmd('check mail')">📬 Check Mail</div>
-  <div class="qp" onclick="doCmd('good morning')">🌅 Morning</div>
+  <div class="qp" onclick="doCmd('good morning Lilly')">🌅 Morning</div>
 </div>
-
-<!-- INPUT BAR -->
 <div class="input-bar">
   <button class="btnmic" id="micBtn" onclick="toggleMic()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -392,7 +290,7 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
     </svg>
   </button>
   <input class="txtin" id="txtin" type="text"
-    placeholder="Ask Lilly anything..."
+    placeholder="Type or tap mic and say Hey Lilly..."
     onkeydown="if(event.key==='Enter')sendText()"/>
   <button class="btnsend" onclick="sendText()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -401,289 +299,312 @@ body.awake     .sdot{background:var(--warn);animation:bl .7s infinite}
     </svg>
   </button>
 </div>
-
 <script>
-// ══════════════════════════════════
-// LILLY AI v4 — Any Device, Multi Gmail
-// ══════════════════════════════════
+// ══════════════════════════════════════════
+// LILLY AI v6 — Backend Server Edition
+// ══════════════════════════════════════════
+
+// !! IMPORTANT: Replace this with your Render server URL after deploying !!
+const SERVER = 'https://lilly-server-6yuk.onrender.com';
 
 const GOOGLE_CLIENT_ID='390703583691-srusv8v5gir3jl3drtacvn4pqi344m3v.apps.googleusercontent.com';
-const GMAIL_SCOPE='https://www.googleapis.com/auth/gmail.readonly';
-const GMAIL_API='https://gmail.googleapis.com/gmail/v1/users/me';
-
-// STATE
-let lang='en-IN', isAwake=false, isRec=false;
-let wakeTimer=null, recog=null, mouthInt=null, waveInt=null;
-let convHistory=[], isOnline=navigator.onLine;
-
-// MULTI ACCOUNT STATE
-// accounts = [{email, token, name, color}]
-let accounts=[], activeAcctIdx=0;
-
+const GMAIL_SCOPE='https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email';
 const ACCT_COLORS=['#00ffcc','#00c8ff','#ff88cc','#ffcc00','#88ff88'];
-
-// WAKE WORDS
-const WAKE_WORDS=['lilly','lily','hey lilly','hey lily','oyy lilly','oyy',
-  'hi lilly','hello lilly','lilli','ಲಿಲ್ಲಿ','లిల్లీ','लिली'];
-
-// COMMANDS
+const WAKE_WORDS=['lilly','lily','hey lilly','hey lily','oyy lilly','oyy','hi lilly','hello lilly','lilli','ಲಿಲ್ಲಿ','లిల్లీ','लिली'];
 const CMDS={
-  mail    :['check mail','read mail','mail','email','inbox','today mail','ಮೇಲ್','మెయిల్','मेल'],
-  morning :['good morning','morning','briefing','ಶುಭೋದಯ','శుభోదయం','सुप्रभात'],
-  calendar:['check calendar','calendar','today schedule','ಕ್ಯಾಲೆಂಡರ್','క్యాలెండర్','कैलेंडर'],
-  tomorrow:['tomorrow','ನಾಳೆ','రేపు','कल'],
-  files   :['organise files','organize files','sort files'],
-  reply   :['draft reply','whatsapp reply','reply'],
-  lock    :['lock screen','lock'],
-  logoff  :['log off','logout','sign out'],
+  mail:['check mail','read mail','mail','email','inbox','today mail','ಮೇಲ್','మెయిల్','मेल'],
+  morning:['good morning','morning','briefing','ಶುಭೋದಯ','శుభోదయం','सुप्रभात'],
+  files:['organise files','organize files','sort files'],
+  reply:['draft reply','whatsapp reply'],
+  lock:['lock screen','lock my screen'],
+  logoff:['log off','logout'],
 };
 
-// ── UTILS ──
+let lang='en-IN',isAwake=false,wakeTimer=null;
+let mouthInt=null,waveInt=null,convHistory=[];
+let accounts=[],activeIdx=0;
+let recog=null,isRec=false,isSpeaking=false;
+let serverOk=false;
+
 const $=id=>document.getElementById(id);
-function setStatus(state,txt){
-  document.body.className=state||'';
-  $('statTxt').textContent=txt;
-  $('dMode').textContent=state?state.toUpperCase():'STANDBY';
-}
-function addBubble(who,html,cls=''){
+function setStatus(s,t){document.body.className=s||'';$('statTxt').textContent=t;$('dMode').textContent=s?s.toUpperCase():'STANDBY';}
+function addBubble(who,html){
   const a=$('chatArea'),d=document.createElement('div');
-  d.className=`bubble ${who} ${cls}`.trim();
+  d.className=`bubble ${who}`;
   d.innerHTML=who==='lilly'?`<div class="spk">LILLY AI</div>${html}`:html;
-  a.appendChild(d);a.scrollTop=a.scrollHeight;return d;
+  a.appendChild(d);a.scrollTop=a.scrollHeight;
 }
-function updateTime(){
-  $('dTime').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});
-}
+function updateTime(){$('dTime').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});}
 setInterval(updateTime,1000);updateTime();
 
-// ── NETWORK ──
-function updateNet(){
-  isOnline=navigator.onLine;
-  const b=$('netBadge');
-  b.className=isOnline?'net-badge online':'net-badge offline';
-  b.textContent=isOnline?'● ONLINE':'● OFFLINE';
+// ── CHECK SERVER ──
+async function checkServer(){
+  try{
+    const r=await fetch(SERVER+'/',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      serverOk=true;
+      $('srvBadge').className='srv-badge ok';$('srvBadge').textContent='● SERVER OK';
+      setStatus('','SYSTEM READY — TAP MIC AND SAY "HEY LILLY"');
+      // Load saved accounts from server
+      loadServerAccounts();
+    }
+  }catch(e){
+    serverOk=false;
+    $('srvBadge').className='srv-badge err';$('srvBadge').textContent='● NO SERVER';
+    setStatus('','SERVER OFFLINE — DEPLOY SERVER FIRST');
+    addBubble('lilly','⚠️ Server is not connected yet. Please deploy the Lilly server on Render first, then update the SERVER URL in the app.');
+  }
 }
-window.addEventListener('online',updateNet);
-window.addEventListener('offline',updateNet);
-updateNet();
+
+async function loadServerAccounts(){
+  try{
+    const r=await fetch(SERVER+'/api/gmail/accounts');
+    const data=await r.json();
+    if(data.accounts&&data.accounts.length>0){
+      accounts=data.accounts.map(a=>({...a,token:null}));
+      activeIdx=0;renderAccounts();
+      $('dAccts').textContent=accounts.length;
+      const msg=`Welcome back Pavan! ${accounts.length} Gmail account${accounts.length>1?'s':''} connected. Say Hey Lilly to start!`;
+      addBubble('lilly',msg);speak(msg);
+    }
+  }catch(e){console.log('Could not load accounts');}
+}
 
 // ── VOICE ──
 function startMouth(){
   const ids=['mb1','mb2','mb3','mb4','mb5','mb6','mb7','mb8'];
   const mn=[8,10,6,12,8,10,6,10],mx=[16,20,12,22,16,20,12,18];
-  mouthInt=setInterval(()=>{
-    ids.forEach((id,i)=>{
-      const el=$(id);if(!el)return;
-      const h=Math.floor(Math.random()*(mx[i]-mn[i]))+mn[i];
-      el.setAttribute('height',h);el.setAttribute('y',120-h);
-    });
-  },90);
-  waveInt=setInterval(()=>{
-    for(let i=0;i<7;i++){const el=$('w'+i);if(el)el.style.height=(Math.floor(Math.random()*14)+3)+'px';}
-  },90);
+  mouthInt=setInterval(()=>{ids.forEach((id,i)=>{const el=$(id);if(!el)return;const h=Math.floor(Math.random()*(mx[i]-mn[i]))+mn[i];el.setAttribute('height',h);el.setAttribute('y',120-h);});},90);
+  waveInt=setInterval(()=>{for(let i=0;i<7;i++){const el=$('w'+i);if(el)el.style.height=(Math.floor(Math.random()*14)+3)+'px';}},90);
 }
 function stopMouth(){
   clearInterval(mouthInt);clearInterval(waveInt);
   const df=[[107,12],[105,16],[108,10],[104,18],[107,12],[105,16],[108,10],[106,14]];
-  ['mb1','mb2','mb3','mb4','mb5','mb6','mb7','mb8'].forEach((id,i)=>{
-    const el=$(id);if(!el)return;
-    el.setAttribute('y',df[i][0]);el.setAttribute('height',df[i][1]);
-  });
+  ['mb1','mb2','mb3','mb4','mb5','mb6','mb7','mb8'].forEach((id,i)=>{const el=$(id);if(!el)return;el.setAttribute('y',df[i][0]);el.setAttribute('height',df[i][1]);});
   for(let i=0;i<7;i++){const el=$('w'+i);if(el)el.style.height='3px';}
 }
-function speak(text){
-  if(!window.speechSynthesis)return;
+function speak(text,cb){
+  if(!window.speechSynthesis)return cb&&cb();
   window.speechSynthesis.cancel();
+  isSpeaking=true;
   const u=new SpeechSynthesisUtterance(text);
   u.lang=lang;u.rate=0.9;u.pitch=1.1;
   const vs=window.speechSynthesis.getVoices();
   const lc=lang.split('-')[0];
-  const female=vs.find(v=>(v.lang===lang||v.lang.startsWith(lc))&&/female|woman|girl|zira|heera|priya|divya|lekha/i.test(v.name));
-  const anyLang=vs.find(v=>v.lang===lang||v.lang.startsWith(lc));
-  if(female)u.voice=female;else if(anyLang)u.voice=anyLang;
+  const fem=vs.find(v=>(v.lang===lang||v.lang.startsWith(lc))&&/female|woman|girl|zira|heera|priya|divya|lekha/i.test(v.name));
+  const any=vs.find(v=>v.lang===lang||v.lang.startsWith(lc));
+  if(fem)u.voice=fem;else if(any)u.voice=any;
   u.onstart=()=>{setStatus('speaking','LILLY SPEAKING');startMouth();};
-  u.onend=()=>{setStatus(isAwake?'awake':'','SYSTEM READY'+(isAwake?' — LISTENING':' — SAY "HEY LILLY"'));stopMouth();};
+  u.onend=()=>{isSpeaking=false;stopMouth();setStatus(isAwake?'awake':'','SYSTEM READY');if(cb)cb();};
+  u.onerror=()=>{isSpeaking=false;stopMouth();if(cb)cb();};
   window.speechSynthesis.speak(u);
 }
-
-// ── LANG ──
-function setLang(l){
-  lang=l;
-  const lb={'en-IN':'EN','kn-IN':'KN','te-IN':'TE','hi-IN':'HI'};
-  $('dLang').textContent=lb[l]||'EN';
-  const g={
-    'en-IN':'Language set to English. How can I help you Pavan?',
-    'kn-IN':'ಭಾಷೆ ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ.',
-    'te-IN':'భాష తెలుగుకు మార్చబడింది.',
-    'hi-IN':'भाषा हिंदी में बदली गई।'
-  };
-  addBubble('lilly',g[l]||g['en-IN']);speak(g[l]||g['en-IN']);
-}
+function setLang(l){lang=l;const lb={'en-IN':'EN','kn-IN':'KN','te-IN':'TE','hi-IN':'HI'};$('dLang').textContent=lb[l]||'EN';}
 
 // ── WAKE ──
 function wakeUp(){
-  if(isAwake)return;
-  isAwake=true;
+  if(isAwake)return;isAwake=true;
   $('wakeBadge').textContent='AWAKE';$('wakeBadge').classList.add('awake');
   const wb=$('wakeBanner');wb.classList.add('show');setTimeout(()=>wb.classList.remove('show'),2500);
   setStatus('awake','LILLY AWAKE — SPEAK YOUR COMMAND');
-  const r={'en-IN':'Yes Pavan! I\'m here, go ahead.','kn-IN':'ಹೌದು ಪವನ್! ನಾನು ಇಲ್ಲಿದ್ದೇನೆ.',
-    'te-IN':'అవును పవన్! నేను ఇక్కడ ఉన్నాను.','hi-IN':'हाँ पवन! मैं यहाँ हूँ।'};
+  const r={'en-IN':'Yes Pavan! Go ahead.','kn-IN':'ಹೌದು ಪವನ್!','te-IN':'అవును పవన్!','hi-IN':'हाँ पवन!'};
   addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);
-  clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>sleep(),30000);
+  clearTimeout(wakeTimer);wakeTimer=setTimeout(()=>goSleep(),25000);
 }
-function sleep(){
-  isAwake=false;
-  $('wakeBadge').textContent='SLEEPING';$('wakeBadge').classList.remove('awake');
-  setStatus('','SYSTEM READY — SAY "HEY LILLY" TO WAKE');
+function goSleep(){isAwake=false;$('wakeBadge').textContent='SLEEPING';$('wakeBadge').classList.remove('awake');setStatus('','TAP MIC AND SAY "HEY LILLY"');}
+function resetWake(){clearTimeout(wakeTimer);if(isAwake)wakeTimer=setTimeout(()=>goSleep(),25000);}
+
+// ── MIC ──
+function toggleMic(){isRec?stopMic():startMic();}
+function startMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){addBubble('lilly','Voice input needs Chrome browser Pavan.');return;}
+  if(isSpeaking){addBubble('lilly','Wait for me to finish speaking first Pavan.');return;}
+  recog=new SR();recog.lang=lang;recog.continuous=false;recog.interimResults=false;recog.maxAlternatives=3;
+  recog.onstart=()=>{isRec=true;$('micBtn').classList.add('rec');setStatus('listening','LISTENING — SPEAK NOW');};
+  recog.onresult=e=>{
+    let t=e.results[0][0].transcript;
+    for(let i=0;i<e.results[0].length;i++){
+      const alt=e.results[0][i].transcript.toLowerCase();
+      if(WAKE_WORDS.some(w=>alt.includes(w))){t=e.results[0][i].transcript;break;}
+    }
+    stopMic();handleSpeech(t);
+  };
+  recog.onerror=()=>{stopMic();};
+  recog.onend=()=>{if(isRec)stopMic();};
+  recog.start();
 }
-function resetWake(){clearTimeout(wakeTimer);if(isAwake)wakeTimer=setTimeout(()=>sleep(),30000);}
+function stopMic(){isRec=false;$('micBtn').classList.remove('rec');if(recog){try{recog.stop();}catch(e){}}setStatus(isAwake?'awake':'','SYSTEM READY');}
 
-// ══════════════════════════════════
-// MULTI GMAIL ACCOUNT SYSTEM
-// ══════════════════════════════════
+// ── HANDLE SPEECH ──
+async function handleSpeech(rawText){
+  if(!rawText||!rawText.trim())return;
+  const lower=rawText.toLowerCase().trim();
+  const hasWake=WAKE_WORDS.some(w=>lower.includes(w));
+  let cmdText=rawText;
+  for(const w of WAKE_WORDS){cmdText=cmdText.replace(new RegExp(w+'[,\\s]*','i'),'').trim();}
+  if(hasWake&&!cmdText.trim()){wakeUp();return;}
+  if(!isAwake&&!hasWake){
+    const r={'en-IN':'Tap the mic and say Hey Lilly first Pavan.','kn-IN':'"Hey Lilly" ಎಂದು ಹೇಳಿ.','te-IN':'"Hey Lilly" అని చెప్పండి.','hi-IN':'"Hey Lilly" कहें।'};
+    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);return;
+  }
+  if(hasWake&&cmdText.trim()&&!isAwake){wakeUp();await new Promise(r=>setTimeout(r,800));}
+  resetWake();
+  addBubble('user',rawText);
+  await processCmd(cmdText||rawText);
+}
 
-function renderAccountsBar(){
-  const bar=$('accountsBar');
-  // Keep add button, rebuild chips
-  bar.innerHTML='';
-  accounts.forEach((acct,i)=>{
-    const chip=document.createElement('div');
-    chip.className='acct-chip'+(i===activeAcctIdx?' active':'');
-    chip.style.borderColor=i===activeAcctIdx?acct.color:'';
-    chip.innerHTML=`<div class="dot" style="background:${i===activeAcctIdx?acct.color:''}"></div>
-      <span>${acct.email.split('@')[0]}</span>
-      <span style="font-size:9px;opacity:.5">✕</span>`;
-    chip.onclick=(e)=>{
-      if(e.target.textContent==='✕'){removeAccount(i);return;}
-      switchAccount(i);
+// ── DETECT CMD ──
+function detectCmd(t){
+  for(const[k,kws]of Object.entries(CMDS)){if(kws.some(w=>t.includes(w)))return k;}
+  return null;
+}
+
+// ── PROCESS CMD ──
+async function processCmd(text){
+  const t=text.toLowerCase().trim();
+  const cmd=detectCmd(t);
+  if(cmd==='mail'||cmd==='morning'){
+    const r={
+      mail:{'en-IN':'Fetching all your emails for today Pavan.','kn-IN':'ಇಮೇಲ್ ತರುತ್ತಿದ್ದೇನೆ.','te-IN':'ఇమెయిల్స్ తీసుకుంటున్నాను.','hi-IN':'ईमेल ला रही हूँ।'},
+      morning:{'en-IN':'Good morning Pavan! Getting your briefing.','kn-IN':'ಶುಭೋದಯ ಪವನ್!','te-IN':'శుభోదయం పవన్!','hi-IN':'सुप्रभात पवन!'}
     };
-    bar.appendChild(chip);
+    addBubble('lilly',r[cmd][lang]||r[cmd]['en-IN']);
+    speak(r[cmd][lang]||r[cmd]['en-IN'],async()=>{
+      if(accounts.length===0){
+        const m='Please tap Add Gmail to connect your Gmail account first Pavan.';
+        addBubble('lilly',m);speak(m);
+      } else {
+        for(let i=0;i<accounts.length;i++){
+          activeIdx=i;renderAccounts();
+          await fetchMail(accounts[i].email);
+          if(i<accounts.length-1)await new Promise(r=>setTimeout(r,500));
+        }
+      }
+    });
+  } else if(cmd==='files'){
+    const r={'en-IN':'File organisation needs the Lilly Python script on your laptop.','kn-IN':'ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.','te-IN':'లాప్టాప్ అవసరం.','hi-IN':'लैपटॉप चाहिए।'};
+    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);
+  } else if(cmd==='lock'){
+    const r={'en-IN':'Lock screen needs the Lilly Python script on your laptop.','kn-IN':'ಲಾಕ್‌ಗೆ ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.','te-IN':'లాక్‌కు లాప్టాప్ అవసరం.','hi-IN':'लॉक के लिए लैपटॉप चाहिए।'};
+    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);
+  } else if(cmd==='logoff'){
+    const r={'en-IN':'Log off needs the Lilly Python script on your laptop.','kn-IN':'ಲಾಗ್ ಆಫ್‌ಗೆ ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.','te-IN':'లాగ్ ఆఫ్‌కు లాప్టాప్ అవసరం.','hi-IN':'लॉग ऑफ के लिए लैपटॉप चाहिए।'};
+    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);
+  } else if(cmd==='reply'){
+    const r={'en-IN':'Please type the WhatsApp message you want to reply to and I will draft it for you.','kn-IN':'WhatsApp ಸಂದೇಶ ಟೈಪ್ ಮಾಡಿ.','te-IN':'WhatsApp సందేశం టైప్ చేయండి.','hi-IN':'WhatsApp संदेश टाइप करें।'};
+    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);
+  } else {
+    await askClaude(text);
+  }
+}
+
+// ── CLAUDE AI via SERVER ──
+async function askClaude(text){
+  if(!serverOk){
+    const m='Server is not connected Pavan. Please deploy the Lilly server on Render first.';
+    addBubble('lilly',m);speak(m);return;
+  }
+  setStatus('thinking','LILLY THINKING');
+  try{
+    const r=await fetch(SERVER+'/api/ask',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:text,history:convHistory,lang})
+    });
+    const data=await r.json();
+    if(data.error){addBubble('lilly','Sorry Pavan, please try again.');speak('Sorry Pavan, please try again.');return;}
+    convHistory.push({role:'user',content:text},{role:'assistant',content:data.reply});
+    if(convHistory.length>12)convHistory=convHistory.slice(-12);
+    addBubble('lilly',data.reply);speak(data.reply);
+  }catch(e){
+    const m='Could not reach server Pavan. Please check internet.';
+    addBubble('lilly',m);speak(m);
+  }
+  setStatus(isAwake?'awake':'','SYSTEM READY');
+}
+
+// ── GMAIL ──
+function renderAccounts(){
+  const bar=$('accountsBar');bar.innerHTML='';
+  accounts.forEach((a,i)=>{
+    const c=document.createElement('div');
+    c.className='acct-chip'+(i===activeIdx?' active':'');
+    c.innerHTML=`<div class="dot" style="background:${i===activeIdx?a.color:''}"></div>
+      <span>${a.email.split('@')[0]}</span>
+      <span style="font-size:9px;opacity:.5;margin-left:3px">✕</span>`;
+    c.onclick=e=>{if(e.target.textContent==='✕')removeAcct(i);else{activeIdx=i;renderAccounts();}};
+    bar.appendChild(c);
   });
-  // Add button
-  const add=document.createElement('div');
-  add.className='acct-chip add-btn';
-  add.textContent='＋ Add Gmail';
-  add.onclick=addGmailAccount;
-  bar.appendChild(add);
+  if(accounts.length<3){
+    const add=document.createElement('div');
+    add.className='acct-chip add-btn';add.textContent='＋ Add Gmail';
+    add.onclick=addGmail;bar.appendChild(add);
+  }
   $('dAccts').textContent=accounts.length;
 }
 
-function addGmailAccount(){
-  if(!isOnline){
-    addBubble('lilly','Please connect to the internet to add a Gmail account.');
-    speak('Please connect to the internet first Pavan.');return;
-  }
-  // Wait for Google Identity Services to load
+function addGmail(){
   if(typeof google==='undefined'||!google.accounts){
-    addBubble('lilly','Google sign-in is loading. Please wait a moment and try again.');
-    setTimeout(addGmailAccount,2000);return;
+    setTimeout(addGmail,1500);return;
   }
   const client=google.accounts.oauth2.initTokenClient({
-    client_id:GOOGLE_CLIENT_ID,
-    scope:GMAIL_SCOPE+' https://www.googleapis.com/auth/userinfo.email',
-    callback:async(resp)=>{
+    client_id:GOOGLE_CLIENT_ID,scope:GMAIL_SCOPE,
+    callback:async resp=>{
       if(!resp.access_token)return;
       try{
-        // Get email address for this token
-        const infoRes=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',
-          {headers:{Authorization:`Bearer ${resp.access_token}`}});
-        const info=await infoRes.json();
+        const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:`Bearer ${resp.access_token}`}});
+        const info=await r.json();
         const email=info.email||'Unknown';
-        const name=info.name||email;
-        // Check if already added
-        if(accounts.find(a=>a.email===email)){
-          addBubble('lilly',`${email} is already connected Pavan!`);
-          speak(`That Gmail account is already connected Pavan.`);return;
-        }
+        if(accounts.find(a=>a.email===email)){speak(`${email.split('@')[0]} is already connected Pavan.`);return;}
         const color=ACCT_COLORS[accounts.length%ACCT_COLORS.length];
-        accounts.push({email,name,token:resp.access_token,color});
-        activeAcctIdx=accounts.length-1;
-        renderAccountsBar();
-        const msg=`✅ Connected: <strong>${email}</strong>`;
-        addBubble('lilly',msg);
-        speak(`Gmail account ${email.split('@')[0]} connected successfully Pavan!`);
-      }catch(e){
-        addBubble('lilly','Could not get account info. Please try again.');
-      }
+        // Save to server
+        if(serverOk){
+          await fetch(SERVER+'/api/gmail/save',{
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({email,token:resp.access_token,color})
+          });
+        }
+        accounts.push({email,token:resp.access_token,color});
+        activeIdx=accounts.length-1;renderAccounts();
+        addBubble('lilly',`✅ Connected: <strong>${email}</strong>`);
+        speak(`Gmail ${email.split('@')[0]} connected and saved permanently Pavan!`);
+      }catch(e){addBubble('lilly','Could not connect Gmail. Please try again.');}
     }
   });
   client.requestAccessToken();
 }
 
-function switchAccount(idx){
-  activeAcctIdx=idx;
-  renderAccountsBar();
-  const acct=accounts[idx];
-  addBubble('lilly',`Switched to <strong>${acct.email}</strong>`);
-  speak(`Switched to ${acct.email.split('@')[0]} Pavan.`);
-}
-
-function removeAccount(idx){
-  const email=accounts[idx].email;
-  accounts.splice(idx,1);
-  if(activeAcctIdx>=accounts.length)activeAcctIdx=Math.max(0,accounts.length-1);
-  renderAccountsBar();
-  addBubble('lilly',`Removed ${email}.`);
-}
-
-// ── FETCH ALL TODAY'S EMAILS (active account) ──
-async function fetchTodayEmails(){
-  if(accounts.length===0){
-    addBubble('lilly','Please tap <strong>+ Add Gmail</strong> above to connect your Gmail account first.');
-    speak('Please add your Gmail account first Pavan.');return;
+async function removeAcct(i){
+  const email=accounts[i].email;
+  if(serverOk){
+    await fetch(SERVER+'/api/gmail/remove/'+encodeURIComponent(email),{method:'DELETE'});
   }
-  const acct=accounts[activeAcctIdx];
+  accounts.splice(i,1);
+  if(activeIdx>=accounts.length)activeIdx=Math.max(0,accounts.length-1);
+  renderAccounts();speak(`Removed ${email.split('@')[0]} Pavan.`);
+}
+
+async function fetchMail(email){
+  if(!serverOk){addBubble('lilly','Server not connected. Please deploy server first.');return;}
   setStatus('thinking','FETCHING EMAILS');
   try{
-    const now=new Date();
-    const startOfDay=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    const after=Math.floor(startOfDay.getTime()/1000);
-    const searchRes=await fetch(
-      `${GMAIL_API}/messages?maxResults=25&q=after:${after}`,
-      {headers:{Authorization:`Bearer ${acct.token}`}}
-    );
-    if(searchRes.status===401){
-      // Token expired — ask to re-login
-      accounts[activeAcctIdx].token=null;
-      renderAccountsBar();
-      addBubble('lilly',`Session expired for ${acct.email}. Please tap + Add Gmail to reconnect.`);
-      speak('Gmail session expired Pavan. Please reconnect your account.');
+    const r=await fetch(SERVER+'/api/gmail/mail',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email})
+    });
+    const data=await r.json();
+    if(data.error){
+      addBubble('lilly',data.error);speak(data.error);
       setStatus(isAwake?'awake':'','SYSTEM READY');return;
     }
-    const searchData=await searchRes.json();
-    if(!searchData.messages||searchData.messages.length===0){
-      const msg={
-        'en-IN':`No emails today for ${acct.email.split('@')[0]}. Your inbox is clear!`,
-        'kn-IN':`${acct.email.split('@')[0]} ಗೆ ಇಂದು ಯಾವ ಇಮೇಲ್‌ಗಳೂ ಇಲ್ಲ.`,
-        'te-IN':`${acct.email.split('@')[0]} కు ఈరోజు ఇమెయిల్‌లు లేవు.`,
-        'hi-IN':`${acct.email.split('@')[0]} को आज कोई ईमेल नहीं।`
-      };
-      addBubble('lilly',msg[lang]||msg['en-IN']);
-      speak(msg[lang]||msg['en-IN']);
+    if(!data.emails||data.emails.length===0){
+      const m=`No emails today for ${email.split('@')[0]} Pavan.`;
+      addBubble('lilly',m);speak(m);
       setStatus(isAwake?'awake':'','SYSTEM READY');return;
     }
-    // Fetch details
-    const emails=[];
-    for(const msg of searchData.messages.slice(0,12)){
-      const det=await fetch(
-        `${GMAIL_API}/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`,
-        {headers:{Authorization:`Bearer ${acct.token}`}}
-      );
-      const d=await det.json();
-      const h=d.payload?.headers||[];
-      const gh=n=>h.find(x=>x.name===n)?.value||'';
-      const from=gh('From').replace(/<.*>/,'').replace(/"/g,'').trim()||'Unknown';
-      const subject=gh('Subject')||'(no subject)';
-      const isUnread=(d.labelIds||[]).includes('UNREAD');
-      const snippet=(d.snippet||'').substring(0,110);
-      emails.push({from,subject,snippet,isUnread});
-    }
-    const total=searchData.messages.length;
-    const unread=emails.filter(e=>e.isUnread).length;
-    // Build card HTML
-    let html=`<div class="email-summary-header">📬 ${acct.email} — ${total} emails today (${unread} unread)</div>`;
-    emails.forEach(e=>{
+    let html=`<div class="email-hdr">📬 ${email.split('@')[0]} — ${data.total} emails today (${data.unread} unread)</div>`;
+    data.emails.forEach(e=>{
       html+=`<div class="email-card">
         <div class="ef">${e.isUnread?'<span class="unread-dot"></span>':''}${e.from}</div>
         <div class="es">${e.subject}</div>
@@ -691,191 +612,31 @@ async function fetchTodayEmails(){
       </div>`;
     });
     addBubble('lilly',html);
-    // Speak summary
-    const summ={
-      'en-IN':`${acct.email.split('@')[0]} has ${total} emails today, ${unread} unread. Latest from ${emails[0].from} — ${emails[0].subject}.`,
-      'kn-IN':`${acct.email.split('@')[0]} ಗೆ ಇಂದು ${total} ಇಮೇಲ್‌ಗಳಿವೆ, ${unread} ಓದಿಲ್ಲ.`,
-      'te-IN':`${acct.email.split('@')[0]} కు ఈరోజు ${total} ఇమెయిల్‌లు, ${unread} చదవలేదు.`,
-      'hi-IN':`${acct.email.split('@')[0]} को आज ${total} ईमेल हैं, ${unread} अपठित।`
-    };
-    speak(summ[lang]||summ['en-IN']);
-  }catch(e){
-    console.error(e);
-    addBubble('lilly','Could not fetch emails right now. Please try again Pavan.');
-    speak('Could not fetch emails right now Pavan.');
-  }
+    speak(`${email.split('@')[0]} has ${data.total} emails today, ${data.unread} unread. Latest from ${data.emails[0].from}.`);
+  }catch(e){addBubble('lilly','Could not fetch emails. Please try again.');}
   setStatus(isAwake?'awake':'','SYSTEM READY');
 }
 
-// ── FETCH ALL ACCOUNTS MAIL ──
-async function fetchAllAccountsMail(){
-  if(accounts.length===0){
-    addBubble('lilly','No Gmail accounts connected yet. Tap + Add Gmail to get started.');
-    speak('Please add your Gmail account first Pavan.');return;
-  }
-  for(let i=0;i<accounts.length;i++){
-    activeAcctIdx=i;renderAccountsBar();
-    await fetchTodayEmails();
-    if(i<accounts.length-1)await new Promise(r=>setTimeout(r,1000));
-  }
-}
-
-// ── DETECT CMD ──
-function detectCmd(text){
-  const t=text.toLowerCase();
-  for(const[k,kws]of Object.entries(CMDS)){if(kws.some(w=>t.includes(w)))return k;}
-  return null;
-}
-
-// ── CLAUDE AI ──
-async function askClaude(userText){
-  setStatus('thinking','LILLY THINKING');
-  const ln={'en-IN':'English','kn-IN':'Kannada','te-IN':'Telugu','hi-IN':'Hindi'};
-  const acctInfo=accounts.length>0?`User has ${accounts.length} Gmail accounts: ${accounts.map(a=>a.email).join(', ')}.`:'No Gmail accounts connected yet.';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:1000,
-        system:`You are Lilly, a warm personal AI assistant for Pavan who lives in Bengaluru, India.
-${acctInfo}
-CRITICAL: Always respond in ${ln[lang]||'English'} only.
-Keep answers 2-4 sentences. Be warm, smart and concise. Address user as Pavan.
-For real-time data you don't have, say so honestly but give your best knowledge.`,
-        messages:[...convHistory,{role:'user',content:userText}]
-      })
-    });
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||'Sorry Pavan, please try again.';
-    convHistory.push({role:'user',content:userText},{role:'assistant',content:reply});
-    if(convHistory.length>12)convHistory=convHistory.slice(-12);
-    return reply;
-  }catch(e){
-    return'I\'m having trouble connecting Pavan. Please check your internet.';
-  }
-}
-
-// CMD RESPONSES
-const CMD_R={
-  morning:{'en-IN':'Good morning Pavan! Fetching all your emails for today\'s briefing.',
-    'kn-IN':'ಶುಭೋದಯ ಪವನ್! ಇಂದಿನ ಮಾಹಿತಿ ತಯಾರಿಸುತ್ತಿದ್ದೇನೆ.',
-    'te-IN':'శుభోదయం పవన్! ఈరోజు సమాచారం తయారు చేస్తున్నాను.',
-    'hi-IN':'सुप्रभात पवन! आज की ब्रीफिंग तैयार कर रही हूँ।'},
-  calendar:{'en-IN':'Checking your Google Calendar for today.',
-    'kn-IN':'ಇಂದಿನ Calendar ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ.',
-    'te-IN':'ఈరోజు Calendar చెక్ చేస్తున్నాను.',
-    'hi-IN':'आज का Calendar चेक कर रही हूँ।'},
-  tomorrow:{'en-IN':'Pulling up tomorrow\'s schedule.',
-    'kn-IN':'ನಾಳೆಯ ಕಾರ್ಯಕ್ರಮ ನೋಡುತ್ತಿದ್ದೇನೆ.',
-    'te-IN':'రేపటి షెడ్యూల్ తీసుకుంటున్నాను.',
-    'hi-IN':'कल का शेड्यूल देख रही हूँ।'},
-  reply:{'en-IN':'Please paste the WhatsApp message you want to reply to and I\'ll draft the perfect response.',
-    'kn-IN':'WhatsApp ಸಂದೇಶ ಇಲ್ಲಿ ಅಂಟಿಸಿ, ಉತ್ತರ ತಯಾರಿಸುತ್ತೇನೆ.',
-    'te-IN':'WhatsApp సందేశాన్ని ఇక్కడ పేస్ట్ చేయండి.',
-    'hi-IN':'WhatsApp संदेश यहाँ पेस्ट करें, जवाब तैयार करूंगी।'},
-  files:{'en-IN':'File organisation needs the Lilly Python script running on your laptop.',
-    'kn-IN':'ಫೈಲ್ ಆಯೋಜನೆಗೆ ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.',
-    'te-IN':'ఫైల్ నిర్వహణకు లాప్టాప్ అవసరం.',
-    'hi-IN':'फ़ाइल व्यवस्था के लिए लैपटॉप चाहिए।'},
-  lock:{'en-IN':'Lock screen needs the Lilly Python script on your laptop.',
-    'kn-IN':'ಲಾಕ್‌ಗೆ ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.',
-    'te-IN':'లాక్‌కు లాప్టాప్ అవసరం.',
-    'hi-IN':'लॉक के लिए लैपटॉप चाहिए।'},
-  logoff:{'en-IN':'Log off needs the Lilly Python script on your laptop.',
-    'kn-IN':'ಲಾಗ್ ಆಫ್‌ಗೆ ಲ್ಯಾಪ್‌ಟಾಪ್ ಬೇಕು.',
-    'te-IN':'లాగ్ ఆఫ్‌కు లాప్టాప్ అవసరం.',
-    'hi-IN':'लॉग ऑफ के लिए लैपटॉप चाहिए।'},
-};
-
-// ── PROCESS ──
-async function processInput(rawText){
-  if(!rawText.trim())return;
-  resetWake();
-  const lower=rawText.toLowerCase().trim();
-  const isWake=WAKE_WORDS.some(w=>lower===w||lower.startsWith(w+' ')||lower.endsWith(' '+w));
-  let cmdText=rawText;
-  for(const w of WAKE_WORDS){cmdText=cmdText.replace(new RegExp('^'+w+'[,\\s]*','i'),'').trim();}
-  if(isWake&&!cmdText){wakeUp();return;}
-  if(!isAwake&&isWake&&cmdText){wakeUp();await new Promise(r=>setTimeout(r,900));}
-  if(!isAwake&&!isWake){
-    const r={'en-IN':'Say "Hey Lilly" first Pavan.',
-      'kn-IN':'"Hey Lilly" ಎಂದು ಹೇಳಿ.',
-      'te-IN':'"Hey Lilly" అని చెప్పండి.',
-      'hi-IN':'"Hey Lilly" कहें।'};
-    addBubble('lilly',r[lang]||r['en-IN']);speak(r[lang]||r['en-IN']);return;
-  }
-  addBubble('user',rawText);
-  const cmd=detectCmd(cmdText||rawText);
-  if(cmd==='mail'||cmd==='morning'){
-    const opening=CMD_R[cmd]?.[lang]||CMD_R[cmd]?.['en-IN']||'';
-    if(opening){addBubble('lilly',opening);speak(opening);}
-    // Check all accounts or just active one
-    setTimeout(async()=>{
-      if(accounts.length>1){
-        // Ask which account
-        const r={
-          'en-IN':`You have ${accounts.length} Gmail accounts. Checking all of them now.`,
-          'kn-IN':`${accounts.length} Gmail ಖಾತೆಗಳಿವೆ. ಎಲ್ಲವನ್ನೂ ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ.`,
-          'te-IN':`${accounts.length} Gmail ఖాతాలు ఉన్నాయి. అన్నీ చెక్ చేస్తున్నాను.`,
-          'hi-IN':`${accounts.length} Gmail खाते हैं। सभी चेक कर रही हूँ।`
-        };
-        addBubble('lilly',r[lang]||r['en-IN']);
-        await fetchAllAccountsMail();
-      } else {
-        await fetchTodayEmails();
-      }
-    },600);
-  } else if(cmd&&CMD_R[cmd]){
-    const r=CMD_R[cmd][lang]||CMD_R[cmd]['en-IN'];
-    setTimeout(()=>{addBubble('lilly',r);speak(r);},400);
-  } else {
-    if(!isOnline){
-      const off={'en-IN':'No internet connection Pavan.',
-        'kn-IN':'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ.',
-        'te-IN':'ఇంటర్నెట్ లేదు.',
-        'hi-IN':'इंटरनेट नहीं है।'};
-      addBubble('lilly',off[lang]||off['en-IN']);speak(off[lang]||off['en-IN']);return;
-    }
-    const answer=await askClaude(cmdText||rawText);
-    addBubble('lilly',answer);speak(answer);
-  }
-}
-
 // ── SEND ──
-function sendText(){const el=$('txtin'),t=el.value.trim();if(!t)return;el.value='';processInput(t);}
-function doCmd(cmd){if(!isAwake)wakeUp();setTimeout(()=>processInput(cmd),600);}
-
-// ── MIC ──
-function toggleMic(){isRec?stopMic():startMic();}
-function startMic(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){addBubble('lilly','Voice input needs Chrome browser.');return;}
-  recog=new SR();recog.lang=lang;recog.continuous=false;recog.interimResults=false;
-  recog.onstart=()=>{isRec=true;$('micBtn').classList.add('rec');setStatus('listening','LISTENING — SPEAK NOW');};
-  recog.onresult=e=>{const t=e.results[0][0].transcript;stopMic();processInput(t);};
-  recog.onerror=()=>{stopMic();};
-  recog.onend=()=>{if(isRec)stopMic();};
-  recog.start();
+function sendText(){
+  const el=$('txtin'),t=el.value.trim();if(!t)return;el.value='';
+  if(!isAwake){wakeUp();setTimeout(()=>{addBubble('user',t);processCmd(t);},800);}
+  else{addBubble('user',t);processCmd(t);}
 }
-function stopMic(){
-  isRec=false;$('micBtn').classList.remove('rec');
-  if(recog){try{recog.stop();}catch(e){}}
-  setStatus(isAwake?'awake':'','SYSTEM READY'+(isAwake?' — LISTENING':' — SAY "HEY LILLY"'));
+async function doCmd(cmd){
+  if(!isAwake)wakeUp();
+  await new Promise(r=>setTimeout(r,600));
+  addBubble('user',cmd);processCmd(cmd);
 }
 
 // ── INIT ──
 window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
-renderAccountsBar();
+renderAccounts();
 window.addEventListener('load',()=>{
   setTimeout(()=>{
-    const g={
-      'en-IN':'Lilly online and ready Pavan. Tap Add Gmail to connect your accounts, then say Hey Lilly.',
-      'kn-IN':'ಲಿಲ್ಲಿ ಸಿದ್ಧ. Gmail ಸೇರಿಸಿ ನಂತರ Hey Lilly ಹೇಳಿ.',
-      'te-IN':'లిల్లీ సిద్ధంగా ఉంది. Gmail జోడించి Hey Lilly చెప్పండి.',
-      'hi-IN':'लिली तैयार है। Gmail जोड़ें फिर Hey Lilly कहें।'
-    };
-    speak(g[lang]||g['en-IN']);
-  },1200);
+    checkServer();
+    speak('Lilly connecting to server Pavan. Please wait.');
+  },1000);
 });
 </script>
 </body>
