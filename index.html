@@ -341,7 +341,7 @@ setInterval(updateTime,1000);updateTime();
 // ── CHECK SERVER ──
 async function checkServer(){
   try{
-    const r=await fetch(SERVER+'/',{signal:AbortSignal.timeout(5000)});
+    const r=await fetch(SERVER+'/',{signal:AbortSignal.timeout(15000)});
     if(r.ok){
       serverOk=true;
       $('srvBadge').className='srv-badge ok';$('srvBadge').textContent='● SERVER OK';
@@ -503,24 +503,49 @@ async function processCmd(text){
 // ── CLAUDE AI via SERVER ──
 async function askClaude(text){
   if(!serverOk){
-    const m='Server is not connected Pavan. Please deploy the Lilly server on Render first.';
-    addBubble('lilly',m);speak(m);return;
+    // Try to reconnect first
+    await checkServer();
+    if(!serverOk){
+      const m='Server is waking up Pavan. Please wait 30 seconds and try again.';
+      addBubble('lilly',m);speak(m);return;
+    }
   }
   setStatus('thinking','LILLY THINKING');
+  addBubble('lilly','<em style="color:var(--muted);font-size:12px">Thinking...</em>');
   try{
+    // Use 60 second timeout to handle Render free tier spin-up
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),60000);
     const r=await fetch(SERVER+'/api/ask',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text,history:convHistory,lang})
+      body:JSON.stringify({message:text,history:convHistory,lang}),
+      signal:controller.signal
     });
+    clearTimeout(timeout);
     const data=await r.json();
-    if(data.error){addBubble('lilly','Sorry Pavan, please try again.');speak('Sorry Pavan, please try again.');return;}
+    if(data.error){
+      console.error('Server error:',data.error);
+      const m='I had trouble thinking Pavan. Please try again in a moment.';
+      addBubble('lilly',m);speak(m);
+      setStatus(isAwake?'awake':'','SYSTEM READY');return;
+    }
     convHistory.push({role:'user',content:text},{role:'assistant',content:data.reply});
     if(convHistory.length>12)convHistory=convHistory.slice(-12);
+    // Remove thinking bubble
+    const bubbles=document.querySelectorAll('.bubble.lilly');
+    const last=bubbles[bubbles.length-1];
+    if(last&&last.querySelector('em'))last.remove();
     addBubble('lilly',data.reply);speak(data.reply);
   }catch(e){
-    const m='Could not reach server Pavan. Please check internet.';
-    addBubble('lilly',m);speak(m);
+    console.error('Fetch error:',e);
+    if(e.name==='AbortError'){
+      const m='Server is taking too long Pavan. The server may be waking up from sleep. Please try again in 30 seconds.';
+      addBubble('lilly',m);speak(m);
+    } else {
+      const m='Could not reach server Pavan. Please check your internet connection.';
+      addBubble('lilly',m);speak(m);
+    }
   }
   setStatus(isAwake?'awake':'','SYSTEM READY');
 }
